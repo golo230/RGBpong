@@ -2,12 +2,13 @@ import pygame, sys, random
 import matplotlib.pyplot as plt
 
 def ball_animation():
-    global ball_speed_x, ball_speed_y, player_score, opponent_score, score_time
+    global ball_speed_x, ball_speed_y, player_score, opponent_score, score_time, ball_color
     
     ball.x += ball_speed_x
     ball.y += ball_speed_y
 
     if ball.top <= 0 or ball.bottom >= screen_height:
+        ball_color = random.choice((0, 255)), random.choice((0, 255)), random.choice((0, 255))
         pygame.mixer.Sound.play(pong_sound)
         ball_speed_y *= -1
     
@@ -22,6 +23,7 @@ def ball_animation():
         score_time = pygame.time.get_ticks()
     
     if ball.colliderect(player) and ball_speed_x > 0:
+        ball_color = random.choice((0, 255)), random.choice((0, 255)), random.choice((0, 255))
         pygame.mixer.Sound.play(pong_sound)
         if abs(ball.right - player.left) < 10:
             ball_speed_x *= -1
@@ -31,6 +33,7 @@ def ball_animation():
             ball_speed_y *= -1
 
     if ball.colliderect(opponent) and ball_speed_x < 0:
+        ball_color = random.choice((0, 255)), random.choice((0, 255)), random.choice((0, 255))
         pygame.mixer.Sound.play(pong_sound)
         if abs(ball.left - opponent.right) < 10:
             ball_speed_x *= -1
@@ -81,6 +84,16 @@ def ball_restart():
         ball_speed_x = 7 * random.choice((1, -1))
         score_time = None
 
+def difficulty():
+    if player_score - opponent_score >= 4:
+        return 11
+    if player_score - opponent_score >= 7:
+        return 14
+    if player_score - opponent_score <= -4:
+        return 5
+    else:
+        return 7
+
 # Setup
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
@@ -96,8 +109,9 @@ player = pygame.Rect(screen_width - 20, screen_height/2 - 70, 10, 140)
 opponent = pygame.Rect(10, screen_height/2 - 70, 10, 140)
 
 # Colors
-bg_color = pygame.Color("grey12")
+bg_color = pygame.Color("#2F373F")
 light_grey = (200, 200, 200)
+ball_color = (random.choice((0, 255)), random.choice((0, 255)), random.choice((0, 255)))
 
 # Variables
 ball_speed_x = 7 * random.choice((1, -1))
@@ -132,22 +146,24 @@ while True:
             if event.key == pygame.K_UP:
                 player_speed += 7
             if event.key == pygame.K_p:
-                plt.pie([player_score, opponent_score])
+                mylabels = ["Your Score", "Opponent's Score"]
+                plt.pie([player_score, opponent_score], labels=mylabels)
                 plt.show()
     
     while temp == 0:
         pygame.mixer.Sound.play(music_sound)
         temp += 1
 
+    opponent_speed = difficulty()
     ball_animation()
     player_animation()
     opponent_ai()
 
     screen.fill(bg_color) # drawn first
+    pygame.draw.aaline(screen, light_grey, (screen_width/2, 0), (screen_width/2, screen_height))
     pygame.draw.rect(screen, light_grey, player)
     pygame.draw.rect(screen, light_grey, opponent)
-    pygame.draw.ellipse(screen, light_grey, ball)
-    pygame.draw.aaline(screen, light_grey, (screen_width/2, 0), (screen_width/2, screen_height))
+    pygame.draw.ellipse(screen, ball_color, ball)
 
     if score_time:
         ball_restart()
