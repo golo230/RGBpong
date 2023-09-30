@@ -1,5 +1,5 @@
-import pygame, sys, random
-# import matplotlib.pyplot as plt TODO: reimplement stats
+import pygame, sys, random, os
+import matplotlib.pyplot as plt
 
 def ball_animation():
     global ball_speed_x, ball_speed_y, player_score, opponent_score, score_time
@@ -151,6 +151,11 @@ versus = -1
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            with open("score.txt", "a") as file1:
+                file1.write("Stats: \n")
+                file1.write(f"Player's Score: {player_score}\n")
+                file1.write(f"Opponent's Score: {opponent_score}\n\n")
+                print("Stats saved successfully!")
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
@@ -163,6 +168,14 @@ while True:
                 player_speed -= 7
             if event.key == pygame.K_UP:
                 player_speed += 7
+            if event.key == pygame.K_p:
+                if player_score == 0 and opponent_score == 0:
+                    print("Score 1 point first")
+                else:
+                    mylabels = ["Your Score", "Opponent's Score"]
+                    plt.pie([player_score, opponent_score], labels=mylabels)
+                    plt.legend()
+                    plt.show()
         if pygame.key.get_pressed()[pygame.K_1]: # default
             theme_num = 1
         if pygame.key.get_pressed()[pygame.K_2]: # Matrix
@@ -170,13 +183,15 @@ while True:
         if pygame.key.get_pressed()[pygame.K_0]:
             theme_num = 0
         if pygame.key.get_pressed()[pygame.K_v]:
-            versus = 1
-            print("Versus Mode Activated")
-            opponent_speed = 0
+            if versus != 1:
+                versus = 1
+                print("Versus Mode Activated")
+                opponent_speed = 0
         if pygame.key.get_pressed()[pygame.K_x]:
-            versus = -1
-            opponent_speed = 7
-            print("AI Mode Activated")
+            if versus != -1:
+                versus = -1
+                opponent_speed = 7
+                print("AI Mode Activated")
         if versus == 1:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
