@@ -1,4 +1,4 @@
-import pygame, sys, random, os
+import pygame, sys, random, os, numpy
 import matplotlib.pyplot as plt
 
 def ball_animation():
