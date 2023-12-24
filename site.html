@@ -2,11 +2,18 @@
 <html>
     <head>
         <link rel="stylesheet" href="style.css">
+        <script type="text/javascript" src="script.js" defer></script>
         <title>RGBPong</title>
     </head>
     <body>
-        <h1>RGB Pong!</h1>
-        <p class="test">Download the game <a href="rgbpong.py" download>here</a></p>
-        <p> Get ready for an epic game of pong</p>
+        <div class="area">
+            <h1>RGB Pong!</h1>
+            <p class="test">Download the game <a href="rgbpong.py" download>here</a></p>
+            <p> Get ready for an epic game of pong</p>
+        </div>
+
+        <img src="pics.jpg" width="50px" height="50px" alt="RGBPongBalls"><br />
+        <button onclick="changeText()">Mystery Button</button>
+        <p id="pingpong"></p>
     </body>
 </html>
