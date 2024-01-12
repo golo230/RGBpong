@@ -1,4 +1,5 @@
-import pygame, sys, random, os, numpy
+import pygame, sys, random
+import numpy as np
 import matplotlib.pyplot as plt
 
 def ball_animation():
@@ -8,21 +9,25 @@ def ball_animation():
     ball.y += ball_speed_y
 
     if ball.top <= 0 or ball.bottom >= screen_height:
-        pygame.mixer.Sound.play(pong_sound)
+        if sounderror == 0:
+            pygame.mixer.Sound.play(pong_sound)
         ball_speed_y *= -1
     
     if ball.left <= 0:
-        pygame.mixer.Sound.play(score_sound)
+        if sounderror == 0:
+            pygame.mixer.Sound.play(score_sound)
         player_score += 1
         score_time = pygame.time.get_ticks()
 
     if ball.right >= screen_width:
-        pygame.mixer.Sound.play(score_sound)
+        if sounderror == 0:
+            pygame.mixer.Sound.play(score_sound)
         opponent_score += 1
         score_time = pygame.time.get_ticks()
     
     if ball.colliderect(player) and ball_speed_x > 0:
-        pygame.mixer.Sound.play(pong_sound)
+        if sounderror == 0:
+            pygame.mixer.Sound.play(pong_sound)
         if abs(ball.right - player.left) < 10:
             ball_speed_x *= -1
         elif abs(ball.bottom - player.top) < 10 and ball_speed_y > 0:
@@ -31,7 +36,8 @@ def ball_animation():
             ball_speed_y *= -1
 
     if ball.colliderect(opponent) and ball_speed_x < 0:
-        pygame.mixer.Sound.play(pong_sound)
+        if sounderror == 0:
+            pygame.mixer.Sound.play(pong_sound)
         if abs(ball.left - opponent.right) < 10:
             ball_speed_x *= -1
         elif abs(ball.bottom - opponent.top) < 10 and ball_speed_y > 0:
@@ -92,9 +98,11 @@ def ball_restart():
 def difficulty():
     if player_score - opponent_score >= 4:
         return 11
-    if player_score - opponent_score >= 7:
+    elif player_score - opponent_score >= 7:
         return 14
-    if player_score - opponent_score <= -4:
+    elif player_score - opponent_score >= 10:
+        return 17
+    elif player_score - opponent_score <= -4:
         return 5
     else:
         return 7
@@ -110,6 +118,27 @@ def set_theme():
     if theme_num == 2:
         bg_color = (0, 0, 0)
         accent_color = (0, 127, 0)
+    if theme_num == 3:
+        bg_color = (0, 0, 0)
+        accent_color = (255, 255, 255)
+    if theme_num == 4:
+        bg_color = (255, 255, 255) # TODO?
+        accent_color = (0, 0, 0)
+    if theme_num == 5:
+        bg_color = pygame.Color("#00539cff")
+        accent_color = pygame.Color("#ffd662ff")
+    if theme_num == 6:
+        bg_color = pygame.Color("#343148ff") # TODO
+        accent_color = pygame.Color("#d7c49eff")
+    if theme_num == 7:
+        bg_color = pygame.Color("#333333")
+        accent_color = pygame.Color("#ff7f00")
+    if theme_num == 8:
+        bg_color = pygame.Color("#89abe3ff") # TODO
+        accent_color = pygame.Color("#fcf6f5ff")
+    if theme_num == 9:
+        bg_color = pygame.Color("#3c1053ff") # TODO
+        accent_color = pygame.Color("#df6589ff")
 
 # Setup
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -117,7 +146,7 @@ pygame.init()
 clock = pygame.time.Clock()
 
 screen_width = 1280
-screen_height = 960
+screen_height = 800
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("RGBPong")
 
@@ -142,20 +171,79 @@ score_time = True
 theme_num = 1
 
 # Sound
-pong_sound = pygame.mixer.Sound("pong.ogg")
-score_sound = pygame.mixer.Sound("score.ogg")
-music_sound = pygame.mixer.Sound("music.ogg")
+sounderror = 0
+try:
+    pong_sound = pygame.mixer.Sound("pong.ogg")
+    score_sound = pygame.mixer.Sound("score.ogg")
+    music_sound = pygame.mixer.Sound("music.ogg")
+except:
+    print("ERROR: could not load sounds")
+    sounderror = 1
+
 music = 0
 versus = -1
 
+menu_call = 1
+
+def menu_loop():
+    global menu_call, score_time
+    quit_button = pygame.Rect(screen_width/2 - 125, screen_height/2+50, 250, 50)
+    play_button = pygame.Rect(screen_width/2 - 125, screen_height/2-50, 250, 50)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and quit_button.collidepoint(event.pos)) or pygame.key.get_pressed()[pygame.K_q]:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and play_button.collidepoint(event.pos):
+                print("success")
+                menu_call = 0
+                break
+
+        screen.fill(bg_color)
+
+        text_color = pygame.Color("#000000")
+        quit_color = pygame.Color("#0002ff")
+        title_color = pygame.Color("#ff2d00")
+        play_color = pygame.Color("#00ff02")
+
+        pygame.draw.rect(screen, play_color, play_button)
+        pygame.draw.rect(screen, quit_color, quit_button)
+        pygame.draw.rect(screen, accent_color, player)
+        pygame.draw.rect(screen, accent_color, opponent)
+
+        play_text = game_font.render("PLAY", False, text_color)
+        screen.blit(play_text, (screen_width/2 - 40, screen_height/2-40))
+        quit_text = game_font.render("QUIT", False, text_color)
+        screen.blit(quit_text, (screen_width/2 - 40, screen_height/2+60))
+        
+        title_text = game_font.render("RGBPong", False, title_color)
+        screen.blit(title_text, (screen_width/2 - 80, screen_height/2-200))
+        pygame.display.flip() # updates window
+        clock.tick(60) # limits to 60 ticks
+
+        if menu_call == 0:
+            score_time = pygame.time.get_ticks()
+            break
+
 while True:
+    if menu_call == 1:
+        menu_loop()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             with open("score.txt", "a") as file1:
-                file1.write("Stats: \n")
-                file1.write(f"Player's Score: {player_score}\n")
-                file1.write(f"Opponent's Score: {opponent_score}\n\n")
-                print("Stats saved successfully!")
+                if player_score != 0 or opponent_score != 0:
+                    file1.write(f"Player's Score: {player_score}\n")
+                    file1.write(f"Opponent's Score: {opponent_score}\n\n")
+                    print("Stats saved successfully!")
+            with open("wlr.txt", "a") as file2:
+                if player_score > opponent_score:
+                    file2.write("1\n")
+                elif player_score < opponent_score:
+                    file2.write("-1\n")
             pygame.quit()
             sys.exit()
         if event.type == pygame.KEYDOWN:
@@ -169,19 +257,48 @@ while True:
             if event.key == pygame.K_UP:
                 player_speed += 7
             if event.key == pygame.K_p:
-                if player_score == 0 and opponent_score == 0:
-                    print("Score 1 point first")
-                else:
-                    mylabels = ["Your Score", "Opponent's Score"]
-                    plt.pie([player_score, opponent_score], labels=mylabels)
-                    plt.legend()
-                    plt.show()
+                player_wins = 0
+                opponent_wins = 0
+                with open("wlr.txt", "r") as file:
+                    for line in file:
+                        if line == "1\n":
+                            player_wins += 1
+                        else:
+                            opponent_wins += 1
+                    mylabels = ["Your Wins", "Opponent's Wins"]
+                    if player_wins != 0 or opponent_wins != 0:
+                        plt.pie(np.array([player_wins, opponent_wins]), labels=mylabels)
+                        plt.legend()
+                        plt.show()
+            if event.key == pygame.K_c:
+                with open("wlr.txt", "w") as file3:
+                    pass
+                with open("score.txt", "w") as file4:
+                    pass
+                print("Stats cleared")
         if pygame.key.get_pressed()[pygame.K_1]: # default
             theme_num = 1
         if pygame.key.get_pressed()[pygame.K_2]: # Matrix
             theme_num = 2
-        if pygame.key.get_pressed()[pygame.K_0]:
+        if pygame.key.get_pressed()[pygame.K_3]: # classic
+            theme_num = 3
+        if pygame.key.get_pressed()[pygame.K_4]: # reverse classic
+            theme_num = 4
+        if pygame.key.get_pressed()[pygame.K_5]: # Berkeley
+            theme_num = 5
+        if pygame.key.get_pressed()[pygame.K_6]: # mellow
+            theme_num = 6
+        if pygame.key.get_pressed()[pygame.K_7]: # half life
+            theme_num = 7
+        if pygame.key.get_pressed()[pygame.K_8]: # cloud in the sky
+            theme_num = 8
+        if pygame.key.get_pressed()[pygame.K_9]: # purple
+            theme_num = 9
+        if pygame.key.get_pressed()[pygame.K_0]: # blackout (joke scheme)
             theme_num = 0
+        if pygame.key.get_pressed()[pygame.K_q]:
+            pygame.quit()
+            sys.exit()
         if pygame.key.get_pressed()[pygame.K_v]:
             if versus != 1:
                 versus = 1
@@ -204,7 +321,7 @@ while True:
                 if event.key == pygame.K_w:
                     opponent_speed += 7
     
-    while music == 0:
+    while music == 0 and sounderror == 0:
         pygame.mixer.Sound.play(music_sound)
         music += 1
 

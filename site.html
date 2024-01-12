@@ -6,14 +6,25 @@
         <title>RGBPong</title>
     </head>
     <body>
-        <div class="area">
-            <h1>RGB Pong!</h1>
-            <p class="test">Download the game <a href="rgbpong.py" download>here</a></p>
-            <p> Get ready for an epic game of pong</p>
-        </div>
+        <main>
+            <div class="area">
+                <img src="logo.png" alt="RGBPong">
+                <p class="test">Download the game <a href="rgbpong.py" download>here</a></p>
+                <p> Get ready for an epic game of pong</p>
+            </div>
+            <div>
+                <h1>Features</h1>
+                <ul>
+                    <li>Dynamic difficulty!</li>
+                    <li>Stat saving!</li>
+                    <li>Color schemes!</li>
+                    <li>Multiplayer!</li>
+                </ul>
+            </div>
+        </main>
 
-        <img src="pics.jpg" width="50px" height="50px" alt="RGBPongBalls"><br />
-        <button onclick="changeText()">Mystery Button</button>
-        <p id="pingpong"></p>
+        <br />
+        <button onclick="changeText()" class="center">Mystery Button</button>
+        <p id="pingpong" class="center"></p>
     </body>
 </html>
