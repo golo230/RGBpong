@@ -1,20 +1,14 @@
-var x = 0;
+// Basic JavaScript to handle smooth scrolling for the "Discover More" button
 
-function changeText() {
-    // Get the paragraph element by its id
-    var paragraph = document.getElementById("pingpong");
-
-    // Change the text content
-    if (x == 0) {
-        paragraph.innerHTML = "Ping!";
-        x = 1;
-    }
-    else if (x == 1) {
-        paragraph.innerHTML = "Pong!"
-        x = 2;
-    }
-    else {
-        paragraph.innerHTML = "Ping!";
-        x = 1;
-    }
-}
+document.addEventListener('DOMContentLoaded', function () {
+    const discoverMoreBtn = document.querySelector('.btn');
+    discoverMoreBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+        const targetId = discoverMoreBtn.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        window.scrollTo({
+            top: targetElement.offsetTop,
+            behavior: 'smooth'
+        });
+    });
+});
