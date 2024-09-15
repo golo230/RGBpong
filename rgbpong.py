@@ -322,7 +322,7 @@ while True:
                     opponent_speed += 7
     
     while music == 0 and sounderror == 0:
-        pygame.mixer.Sound.play(music_sound)
+        pygame.mixer.Sound.play(music_sound) # plays music
         music += 1
 
     set_theme()
